@@ -14,14 +14,28 @@
 //  limitations under the License.
 
 (function (window) {
-    var name = 'SimpleReach';
+    var name = 'SimpleReach',
+        SimpleReachCustomFlags = {
+            Title: 'SimpleReach.Title',
+            Url: 'SimpleReach.Url',
+            Date: 'SimpleReach.Date',
+            Authors: 'SimpleReach.Authors',
+            Channels: 'SimpleReach.Channels',
+            Tags: 'SimpleReach.Tags',
+            ContentHeight: 'SimpleReach.ContentHeight'
+        },
+        MessageType = {
+            PageView: 3
+        };
 
     var constructor = function () {
         var self = this,
             forwarderSettings,
             reportingService,
             isInitialized = false,
-            isTesting = false;
+            isTesting = false,
+            pid = null,
+            user_id = null;
 
         self.name = name;
 
@@ -30,13 +44,61 @@
 
             if (isInitialized) {
 
-                if(reportEvent && reportingService) {
+                if (event.EventDataType == MessageType.PageView) {
+                    reportEvent = true;
+                    processSimpleReachEvent(event);
+                }
+
+                if (reportEvent && reportingService) {
                     reportingService(self, event);
                 }
             }
             else {
                 return 'Can\'t send to forwarder ' + name + ', not initialized';
             }
+        }
+
+        function copyCustomFlags(sourceObj, destObj) {
+            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Title)) {
+                destObj.title = sourceObj[SimpleReachCustomFlags.Title];
+            }
+
+            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Url)) {
+                destObj.url = sourceObj[SimpleReachCustomFlags.Url];
+            }
+
+            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Date)) {
+                destObj.date = sourceObj[SimpleReachCustomFlags.Date];
+            }
+
+            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Authors)) {
+                destObj.authors = sourceObj[SimpleReachCustomFlags.Authors];
+            }
+
+            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Channels)) {
+                destObj.channels = sourceObj[SimpleReachCustomFlags.Channels];
+            }
+
+            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Tags)) {
+                destObj.tags = sourceObj[SimpleReachCustomFlags.Tags];
+            }
+
+            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.ContentHeight)) {
+                destObj.content_height = sourceObj[SimpleReachCustomFlags.ContentHeight];
+            }
+        }
+
+        function processSimpleReachEvent(event) {
+            var eventData = {
+                title: event.EventAttributes.title,
+                pid: pid
+            };
+
+            if (event.CustomFlags) {
+                copyCustomFlags(event.CustomFlags, eventData);
+            }
+            
+            window.SPR.Reach.collect(eventData);
         }
 
         function initForwarder(settings,
@@ -46,13 +108,37 @@
             userAttributes,
             userIdentities,
             appVersion,
-            appName) {
+            appName,
+            customFlags) {
+
+            var simpleReachConfig = {};
 
             try {
                 forwarderSettings = settings;
                 reportingService = service;
                 isTesting = testMode;
-               
+                pid = settings.pid;
+
+                simpleReachConfig.pid = pid;
+                simpleReachConfig.ignore_errors = false;
+
+                if (customFlags) {
+                    copyCustomFlags(customFlags, simpleReachConfig);
+                }
+
+                window.__reach_config = simpleReachConfig;
+
+                if (isTesting !== true) {
+                    (function () {
+                        var s = document.createElement('script');
+                        s.async = true;
+                        s.type = 'text/javascript';
+                        s.src = document.location.protocol + '//d8rk54i4mohrb.cloudfront.net/js/reach.js';
+                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+                    })();
+                }
+
+                isInitialized = true;
 
                 return 'Successfully initialized: ' + name;
             }
@@ -60,7 +146,7 @@
                 return 'Failed to initialize: ' + name;
             }
         }
-        
+
         this.init = initForwarder;
         this.process = processEvent;
     };
