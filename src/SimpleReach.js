@@ -15,6 +15,7 @@
 
 (function (window) {
     var name = 'SimpleReach',
+        moduleId = 87,
         SimpleReachCustomFlags = {
             Title: 'SimpleReach.Title',
             Url: 'SimpleReach.Url',
@@ -151,13 +152,29 @@
         this.process = processEvent;
     };
 
+    function getId() {
+        return moduleId;
+    }
+
+    function register(config) {
+        if (config.kits) {
+            config.kits[name] = {
+                constructor: constructor
+            };
+        }
+    }
+
     if (!window || !window.mParticle || !window.mParticle.addForwarder) {
         return;
     }
 
     window.mParticle.addForwarder({
         name: name,
-        constructor: constructor
+        constructor: constructor,
+        getId: getId
     });
 
+    module.exports = {
+        register: register
+    };
 })(window);
