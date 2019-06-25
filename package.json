@@ -17,7 +17,7 @@
     "rollup-plugin-node-resolve": "^5.0.1"
   },
   "dependencies": {
-      "@mparticle/web-sdk": "^2.9.4-rc.1"
+    "@mparticle/web-sdk": "^2.9.4-rc.1"
   },
   "scripts": {
     "build": "rollup --config rollup.config.js",
