@@ -1,198 +1,213 @@
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-	typeof define === 'function' && define.amd ? define(['exports'], factory) :
-	(global = global || self, factory(global['mp-simplereach-kit'] = {}));
-}(this, function (exports) {
-	function createCommonjsModule(fn, module) {
-		return module = { exports: {} }, fn(module, module.exports), module.exports;
-	}
+var mpSimpleReachKit = (function (exports) {
+  /*!
+   * isobject <https://github.com/jonschlinkert/isobject>
+   *
+   * Copyright (c) 2014-2017, Jon Schlinkert.
+   * Released under the MIT License.
+   */
 
-	var SimpleReach = createCommonjsModule(function (module) {
-	//
-	//  Copyright 2015 mParticle, Inc.
-	//
-	//  Licensed under the Apache License, Version 2.0 (the "License");
-	//  you may not use this file except in compliance with the License.
-	//  You may obtain a copy of the License at
-	//
-	//      http://www.apache.org/licenses/LICENSE-2.0
-	//
-	//  Unless required by applicable law or agreed to in writing, software
-	//  distributed under the License is distributed on an "AS IS" BASIS,
-	//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	//  See the License for the specific language governing permissions and
-	//  limitations under the License.
+  function isObject(val) {
+    return val != null && typeof val === 'object' && Array.isArray(val) === false;
+  }
 
-	(function (window) {
-	    var name = 'SimpleReach',
-	        moduleId = 87,
-	        SimpleReachCustomFlags = {
-	            Title: 'SimpleReach.Title',
-	            Url: 'SimpleReach.Url',
-	            Date: 'SimpleReach.Date',
-	            Authors: 'SimpleReach.Authors',
-	            Channels: 'SimpleReach.Channels',
-	            Tags: 'SimpleReach.Tags',
-	            ContentHeight: 'SimpleReach.ContentHeight'
-	        },
-	        MessageType = {
-	            PageView: 3
-	        };
+  //
+  //  Copyright 2015 mParticle, Inc.
+  //
+  //  Licensed under the Apache License, Version 2.0 (the "License");
+  //  you may not use this file except in compliance with the License.
+  //  You may obtain a copy of the License at
+  //
+  //      http://www.apache.org/licenses/LICENSE-2.0
+  //
+  //  Unless required by applicable law or agreed to in writing, software
+  //  distributed under the License is distributed on an "AS IS" BASIS,
+  //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  //  See the License for the specific language governing permissions and
+  //  limitations under the License.
 
-	    var constructor = function () {
-	        var self = this,
-	            forwarderSettings,
-	            reportingService,
-	            isInitialized = false,
-	            isTesting = false,
-	            pid = null;
+      
 
-	        self.name = name;
+      var name = 'SimpleReach',
+          moduleId = 87,
+          SimpleReachCustomFlags = {
+              Title: 'SimpleReach.Title',
+              Url: 'SimpleReach.Url',
+              Date: 'SimpleReach.Date',
+              Authors: 'SimpleReach.Authors',
+              Channels: 'SimpleReach.Channels',
+              Tags: 'SimpleReach.Tags',
+              ContentHeight: 'SimpleReach.ContentHeight'
+          },
+          MessageType = {
+              PageView: 3
+          };
 
-	        function processEvent(event) {
-	            var reportEvent = false;
+      var constructor = function () {
+          var self = this,
+              forwarderSettings,
+              reportingService,
+              isInitialized = false,
+              isTesting = false,
+              pid = null;
 
-	            if (isInitialized) {
+          self.name = name;
 
-	                if (event.EventDataType == MessageType.PageView) {
-	                    reportEvent = true;
-	                    processSimpleReachEvent(event);
-	                }
+          function processEvent(event) {
+              var reportEvent = false;
 
-	                if (reportEvent && reportingService) {
-	                    reportingService(self, event);
-	                }
-	            }
-	            else {
-	                return 'Can\'t send to forwarder ' + name + ', not initialized';
-	            }
-	        }
+              if (isInitialized) {
 
-	        function copyCustomFlags(sourceObj, destObj) {
-	            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Title)) {
-	                destObj.title = sourceObj[SimpleReachCustomFlags.Title];
-	            }
+                  if (event.EventDataType == MessageType.PageView) {
+                      reportEvent = true;
+                      processSimpleReachEvent(event);
+                  }
 
-	            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Url)) {
-	                destObj.url = sourceObj[SimpleReachCustomFlags.Url];
-	            }
+                  if (reportEvent && reportingService) {
+                      reportingService(self, event);
+                  }
+              }
+              else {
+                  return 'Can\'t send to forwarder ' + name + ', not initialized';
+              }
+          }
 
-	            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Date)) {
-	                destObj.date = sourceObj[SimpleReachCustomFlags.Date];
-	            }
+          function copyCustomFlags(sourceObj, destObj) {
+              if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Title)) {
+                  destObj.title = sourceObj[SimpleReachCustomFlags.Title];
+              }
 
-	            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Authors)) {
-	                destObj.authors = sourceObj[SimpleReachCustomFlags.Authors];
-	            }
+              if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Url)) {
+                  destObj.url = sourceObj[SimpleReachCustomFlags.Url];
+              }
 
-	            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Channels)) {
-	                destObj.channels = sourceObj[SimpleReachCustomFlags.Channels];
-	            }
+              if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Date)) {
+                  destObj.date = sourceObj[SimpleReachCustomFlags.Date];
+              }
 
-	            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Tags)) {
-	                destObj.tags = sourceObj[SimpleReachCustomFlags.Tags];
-	            }
+              if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Authors)) {
+                  destObj.authors = sourceObj[SimpleReachCustomFlags.Authors];
+              }
 
-	            if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.ContentHeight)) {
-	                destObj.content_height = sourceObj[SimpleReachCustomFlags.ContentHeight];
-	            }
-	        }
+              if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Channels)) {
+                  destObj.channels = sourceObj[SimpleReachCustomFlags.Channels];
+              }
 
-	        function processSimpleReachEvent(event) {
-	            var eventData = {
-	                title: event.EventAttributes.title,
-	                pid: pid
-	            };
+              if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.Tags)) {
+                  destObj.tags = sourceObj[SimpleReachCustomFlags.Tags];
+              }
 
-	            if (event.CustomFlags) {
-	                copyCustomFlags(event.CustomFlags, eventData);
-	            }
-	            
-	            window.SPR.Reach.collect(eventData);
-	        }
+              if (sourceObj.hasOwnProperty(SimpleReachCustomFlags.ContentHeight)) {
+                  destObj.content_height = sourceObj[SimpleReachCustomFlags.ContentHeight];
+              }
+          }
 
-	        function initForwarder(settings,
-	            service,
-	            testMode,
-	            trackerId,
-	            userAttributes,
-	            userIdentities,
-	            appVersion,
-	            appName,
-	            customFlags) {
+          function processSimpleReachEvent(event) {
+              var eventData = {
+                  title: event.EventAttributes.title,
+                  pid: pid
+              };
 
-	            var simpleReachConfig = {};
+              if (event.CustomFlags) {
+                  copyCustomFlags(event.CustomFlags, eventData);
+              }
+              
+              window.SPR.Reach.collect(eventData);
+          }
 
-	            try {
-	                forwarderSettings = settings;
-	                reportingService = service;
-	                isTesting = testMode;
-	                pid = settings.pid;
+          function initForwarder(settings,
+              service,
+              testMode,
+              trackerId,
+              userAttributes,
+              userIdentities,
+              appVersion,
+              appName,
+              customFlags) {
 
-	                simpleReachConfig.pid = pid;
-	                simpleReachConfig.ignore_errors = false;
+              var simpleReachConfig = {};
 
-	                if (customFlags) {
-	                    copyCustomFlags(customFlags, simpleReachConfig);
-	                }
+              try {
+                  forwarderSettings = settings;
+                  reportingService = service;
+                  isTesting = testMode;
+                  pid = settings.pid;
 
-	                window.__reach_config = simpleReachConfig;
+                  simpleReachConfig.pid = pid;
+                  simpleReachConfig.ignore_errors = false;
 
-	                if (isTesting !== true) {
-	                    (function () {
-	                        var s = document.createElement('script');
-	                        s.async = true;
-	                        s.type = 'text/javascript';
-	                        s.src = document.location.protocol + '//d8rk54i4mohrb.cloudfront.net/js/reach.js';
-	                        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
-	                    })();
-	                }
+                  if (customFlags) {
+                      copyCustomFlags(customFlags, simpleReachConfig);
+                  }
 
-	                isInitialized = true;
+                  window.__reach_config = simpleReachConfig;
 
-	                return 'Successfully initialized: ' + name;
-	            }
-	            catch (e) {
-	                return 'Failed to initialize: ' + name;
-	            }
-	        }
+                  if (isTesting !== true) {
+                      (function () {
+                          var s = document.createElement('script');
+                          s.async = true;
+                          s.type = 'text/javascript';
+                          s.src = document.location.protocol + '//d8rk54i4mohrb.cloudfront.net/js/reach.js';
+                          (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(s);
+                      })();
+                  }
 
-	        this.init = initForwarder;
-	        this.process = processEvent;
-	    };
+                  isInitialized = true;
 
-	    function getId() {
-	        return moduleId;
-	    }
+                  return 'Successfully initialized: ' + name;
+              }
+              catch (e) {
+                  return 'Failed to initialize: ' + name;
+              }
+          }
 
-	    function register(config) {
-	        if (config.kits) {
-	            config.kits[name] = {
-	                constructor: constructor
-	            };
-	        }
-	    }
+          this.init = initForwarder;
+          this.process = processEvent;
+      };
 
-	    if (!window || !window.mParticle || !window.mParticle.addForwarder) {
-	        return;
-	    }
+      function getId() {
+          return moduleId;
+      }
 
-	    window.mParticle.addForwarder({
-	        name: name,
-	        constructor: constructor,
-	        getId: getId
-	    });
+      function register(config) {
+          if (!config) {
+              window.console.log('You must pass a config object to register the kit ' + name);
+              return;
+          }
 
-	    module.exports = {
-	        register: register
-	    };
-	})(window);
-	});
-	var SimpleReach_1 = SimpleReach.register;
+          if (!isObject(config)) {
+              window.console.log('\'config\' must be an object. You passed in a ' + typeof config);
+              return;
+          }
 
-	exports.default = SimpleReach;
-	exports.register = SimpleReach_1;
+          if (isObject(config.kits)) {
+              config.kits[name] = {
+                  constructor: constructor
+              };
+          } else {
+              config.kits = {};
+              config.kits[name] = {
+                  constructor: constructor
+              };
+          }
+          window.console.log('Successfully registered ' + name + ' to your mParticle configuration');
+      }
 
-	Object.defineProperty(exports, '__esModule', { value: true });
+      if (window && window.mParticle && window.mParticle.addForwarder) {
+          window.mParticle.addForwarder({
+              name: name,
+              constructor: constructor,
+              getId: getId
+          });
+      }
 
-}));
+      var SimpleReach = {
+          register: register
+      };
+  var SimpleReach_1 = SimpleReach.register;
+
+  exports.default = SimpleReach;
+  exports.register = SimpleReach_1;
+
+  return exports;
+
+}({}));
