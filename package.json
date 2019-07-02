@@ -3,9 +3,9 @@
   "version": "2.0.1-rc.1",
   "author": "mParticle Developers <developers@mparticle.com> (https://www.mparticle.com)",
   "description": "mParticle integration sdk for SimpleReach",
-  "browser": "npm/SimpleReach.js",
+  "browser": "dist/SimpleReach.common.js",
   "files": [
-    "npm/SimpleReach.js"
+    "dist/SimpleReach.common.js"
   ],
   "repository": "https://github.com/mparticle-integrations/mparticle-javascript-integration-simplereach",
   "scripts": {

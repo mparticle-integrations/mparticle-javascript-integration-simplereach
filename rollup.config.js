@@ -21,7 +21,7 @@ export default [
     {
         input: 'src/SimpleReach.js',
         output: {
-            file: 'dist/SimpleReach.js',
+            file: 'dist/SimpleReach.iffe.js',
             format: 'iife',
             exports: 'named',
             name: 'mpSimpleReachKit',
@@ -37,7 +37,7 @@ export default [
     {
         input: 'src/SimpleReach.js',
         output: {
-            file: 'npm/SimpleReach.js',
+            file: 'dist/SimpleReach.common.js',
             format: 'cjs',
             exports: 'named',
             name: 'mpSimpleReachKit',
