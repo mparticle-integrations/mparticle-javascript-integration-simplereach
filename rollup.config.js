@@ -21,7 +21,7 @@ export default [
     {
         input: 'src/SimpleReach.js',
         output: {
-            file: 'dist/SimpleReach.iffe.js',
+            file: 'dist/SimpleReach.iife.js',
             format: 'iife',
             exports: 'named',
             name: 'mpSimpleReachKit',
